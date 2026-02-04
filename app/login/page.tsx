@@ -1,3 +1,4 @@
+// login.tsx
 "use client";
 
 import { useState } from "react";
@@ -18,18 +19,20 @@ export default function LoginPage() {
     });
 
     const data = await res.json();
-    console.log(data);
 
     if (!res.ok) {
       alert(data.message);
       return;
     }
 
-   localStorage.setItem("token", data.token);
-localStorage.setItem("user", JSON.stringify(data.user));
+    // Save data to storage
+    localStorage.setItem("token", data.token);
+    localStorage.setItem("user", JSON.stringify(data.user));
 
+    // ✅ FIX: Trigger Navbar update immediately without reload
+    window.dispatchEvent(new Event("auth-change"));
 
-    // 🔥 ROLE BASED REDIRECT
+    // Role-based redirect
     if (data.user.role === "admin") {
       router.push("/");
     } else if (data.user.role === "seller") {
@@ -40,19 +43,27 @@ localStorage.setItem("user", JSON.stringify(data.user));
   };
 
   return (
-    <form onSubmit={handleSubmit} className="max-w-md mx-auto p-6 space-y-4">
-      <input
-        className="input input-bordered w-full"
-        placeholder="Email"
-        onChange={e => setEmail(e.target.value)}
-      />
-      <input
-        type="password"
-        className="input input-bordered w-full"
-        placeholder="Password"
-        onChange={e => setPassword(e.target.value)}
-      />
-      <button className="btn btn-primary w-full">Login</button>
-    </form>
+    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+      <form onSubmit={handleSubmit} className="w-full max-w-md bg-white p-8 rounded-xl shadow space-y-4">
+        <h2 className="text-2xl font-bold text-center text-blue-600">Login to MediStore</h2>
+        <input
+          type="email"
+          className="w-full border px-4 py-2 rounded bg-white text-gray-900"
+          placeholder="Email"
+          onChange={e => setEmail(e.target.value)}
+          required
+        />
+        <input
+          type="password"
+          className="w-full border px-4 py-2 rounded bg-white text-gray-900"
+          placeholder="Password"
+          onChange={e => setPassword(e.target.value)}
+          required
+        />
+        <button className="btn btn-primary w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700">
+          Login
+        </button>
+      </form>
+    </div>
   );
 }

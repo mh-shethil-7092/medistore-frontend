@@ -1,6 +1,7 @@
 import "./globals.css";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import { CartProvider } from "@/context/CartContext"; // ✅ Added this import
 
 export default function RootLayout({
   children,
@@ -10,9 +11,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="bg-zinc-950 text-zinc-100 min-h-screen flex flex-col">
-        <Navbar />
-        <main className="flex-grow">{children}</main>
-        <Footer />
+        {/* ✅ Wrap everything in CartProvider */}
+        <CartProvider>
+          <Navbar />
+          <main className="flex-grow">{children}</main>
+          <Footer />
+        </CartProvider>
       </body>
     </html>
   );
