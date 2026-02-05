@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useCart } from "@/context/CartContext"; // ✅ Added Cart Hook
+import { useCart } from "@/context/CartContext"; 
 
 type User = {
   name: string;
@@ -13,14 +13,13 @@ type User = {
 export default function Navbar() {
   const router = useRouter();
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const { cart } = useCart(); // ✅ Get cart state
+  const { cart } = useCart(); 
 
   const [user, setUser] = useState<User | null>(null);
   const [mounted, setMounted] = useState(false);
   const [open, setOpen] = useState(false);
 
-  // Calculate total items for the badge
-  const cartCount = cart.reduce((acc, item) => acc + item.quantity, 0);
+  const cartCount = cart.reduce((acc: number, item: any) => acc + (item.quantity || 0), 0);
 
   const loadUser = () => {
     const storedUser = localStorage.getItem("user");
@@ -67,19 +66,18 @@ export default function Navbar() {
   return (
     <nav className="bg-zinc-900 border-b border-zinc-800 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
-        {/* Logo */}
         <Link href="/" className="text-xl font-bold text-white flex items-center gap-2">
           MediStore <span className="text-sm bg-blue-600/20 text-blue-400 px-2 py-0.5 rounded">Plus</span>
         </Link>
 
-        {/* Right side */}
         <div className="flex items-center gap-6 text-sm">
-          <Link href="/shop" className="text-zinc-300 hover:text-white transition">
-            Shop
-          </Link>
+          <Link href="/shop" className="text-zinc-300 hover:text-white transition">Shop</Link>
 
-          {/* Cart Icon for Customers */}
-          {(!user || user.role === "customer") && (
+          {/* FIX: Changed logic from (!user || user.role === "customer") 
+              to (user && user.role === "customer"). 
+              Now, the Cart link only shows if a user is logged in AND they are a customer.
+          */}
+          {user && user.role === "customer" && (
             <Link href="/customer" className="relative text-zinc-300 hover:text-white transition">
               Cart
               {cartCount > 0 && (
@@ -108,12 +106,11 @@ export default function Navbar() {
               </button>
 
               {open && (
-                <div className="absolute right-0 mt-2 w-52 bg-zinc-800 border border-zinc-700 rounded-lg shadow-xl overflow-hidden z-50 animate-in fade-in zoom-in duration-150">
+                <div className="absolute right-0 mt-2 w-52 bg-zinc-800 border border-zinc-700 rounded-lg shadow-xl overflow-hidden z-50">
                   <div className="px-4 py-3 border-b border-zinc-700 bg-zinc-800/50">
                     <p className="text-sm font-medium text-white truncate">{user.name}</p>
                     <p className="text-xs text-blue-400 capitalize font-mono">{user.role}</p>
                   </div>
-
                   <Link
                     href={user.role === "admin" ? "/admin" : user.role === "seller" ? "/seller" : "/customer"}
                     className="block px-4 py-2 text-sm text-zinc-300 hover:bg-zinc-700 transition"
@@ -121,11 +118,7 @@ export default function Navbar() {
                   >
                     {user.role === "seller" ? "Manage Inventory" : "My Dashboard"}
                   </Link>
-
-                  <button
-                    onClick={logout}
-                    className="w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-zinc-700 transition"
-                  >
+                  <button onClick={logout} className="w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-zinc-700 transition">
                     Logout
                   </button>
                 </div>

@@ -3,17 +3,21 @@ import { useCart } from "@/context/CartContext";
 import { IMedicine } from "@/types/medicine";
 
 export default function MedicineCard({ medicine }: { medicine: IMedicine }) {
-  const { addToCart } = useCart(); // ✅ Get the function from context
+  const { addToCart } = useCart(); 
 
   const handleAdd = () => {
-    console.log("Adding to cart:", medicine.name); // Debugging line
+    console.log("Adding to cart:", medicine.name); 
+    
+    // FIX: Cast the object to 'any' or your CartItem type 
+    // because IMedicine doesn't natively include the 'quantity' property.
     addToCart({
       _id: medicine._id,
       name: medicine.name,
       price: medicine.price,
       image: medicine.image,
-      quantity: 1, // Default quantity
-    });
+      quantity: 1, 
+    } as any); 
+    
     alert(`${medicine.name} added to cart!`);
   };
 
@@ -30,7 +34,7 @@ export default function MedicineCard({ medicine }: { medicine: IMedicine }) {
       <div className="flex justify-between items-center mt-4">
         <span className="text-blue-400 font-bold">${medicine.price}</span>
         <button 
-          onClick={handleAdd} // ✅ Connect the click handler
+          onClick={handleAdd} 
           className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-500 transition"
         >
           Add to Cart
