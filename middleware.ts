@@ -1,27 +1,61 @@
-import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 
 export function middleware(request: NextRequest) {
-  // 1. Get the token or user from cookies (localStorage doesn't work in middleware)
-  const userCookie = request.cookies.get('user')?.value;
   const { pathname } = request.nextUrl;
 
-  // 2. Define protected routes
-  if (pathname.startsWith('/admin') || pathname.startsWith('/seller') || pathname.startsWith('/customer')) {
-    if (!userCookie) {
-      return NextResponse.redirect(new URL('/login', request.url));
+  if (pathname.startsWith("/_next") || pathname.startsWith("/api")) {
+    return NextResponse.next();
+  }
+
+  const userCookie = request.cookies.get("user")?.value;
+  let user: any = null;
+
+  if (userCookie) {
+    try {
+      user = JSON.parse(userCookie);
+    } catch {
+      user = null;
     }
-    
-    // Optional: Check specific roles if you store role in the cookie
-    const user = JSON.parse(userCookie);
-    if (pathname.startsWith('/admin') && user.role !== 'admin') {
-      return NextResponse.redirect(new URL('/', request.url));
-    }
+  }
+
+  const protectedRoutes = ["/admin", "/seller", "/customer"];
+  const authRoutes = ["/login", "/register"];
+
+  const isProtected = protectedRoutes.some(r => pathname.startsWith(r));
+  const isAuth = authRoutes.includes(pathname);
+
+  if (isProtected && !user) {
+    return NextResponse.redirect(new URL("/login", request.url));
+  }
+
+  if (isAuth && user?.role) {
+    return NextResponse.redirect(
+      new URL(`/${user.role}`, request.url)
+    );
+  }
+
+  if (pathname.startsWith("/admin") && user?.role !== "admin") {
+    return NextResponse.redirect(new URL("/", request.url));
+  }
+
+  if (pathname.startsWith("/seller") && user?.role !== "seller") {
+    return NextResponse.redirect(new URL("/", request.url));
+  }
+
+  if (pathname.startsWith("/customer") && user?.role !== "customer") {
+    return NextResponse.redirect(new URL("/", request.url));
   }
 
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ['/admin/:path*', '/seller/:path*', '/customer/:path*'],
+  matcher: [
+    "/admin/:path*",
+    "/seller/:path*",
+    "/customer/:path*",
+    "/login",
+    "/register",
+  ],
 };

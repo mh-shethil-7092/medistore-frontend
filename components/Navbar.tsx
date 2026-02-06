@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useCart } from "@/context/CartContext"; 
+import Cookies from "js-cookie";
+import { useCart } from "@/context/CartContext";
 
 type User = {
   name: string;
@@ -13,13 +14,16 @@ type User = {
 export default function Navbar() {
   const router = useRouter();
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const { cart } = useCart(); 
+  const { cart } = useCart();
 
   const [user, setUser] = useState<User | null>(null);
   const [mounted, setMounted] = useState(false);
   const [open, setOpen] = useState(false);
 
-  const cartCount = cart.reduce((acc: number, item: any) => acc + (item.quantity || 0), 0);
+  const cartCount = cart.reduce(
+    (acc: number, item: any) => acc + (item.quantity || 0),
+    0
+  );
 
   const loadUser = () => {
     const storedUser = localStorage.getItem("user");
@@ -38,25 +42,36 @@ export default function Navbar() {
     loadUser();
     setMounted(true);
     window.addEventListener("auth-change", loadUser);
-    return () => window.removeEventListener("auth-change", loadUser);
+    return () =>
+      window.removeEventListener("auth-change", loadUser);
   }, []);
 
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(e.target as Node)
+      ) {
         setOpen(false);
       }
     };
     document.addEventListener("mousedown", handleClick);
-    return () => document.removeEventListener("mousedown", handleClick);
+    return () =>
+      document.removeEventListener("mousedown", handleClick);
   }, []);
 
   const logout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
+
+    Cookies.remove("user", { path: "/" });
+    Cookies.remove("token", { path: "/" });
+
     setUser(null);
     window.dispatchEvent(new Event("auth-change"));
-    router.push("/");
+
+    router.push("/login");
+    router.refresh();
   };
 
   if (!mounted) {
@@ -66,22 +81,20 @@ export default function Navbar() {
   return (
     <nav className="bg-zinc-900 border-b border-zinc-800 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
-        <Link href="/" className="text-xl font-bold text-white flex items-center gap-2">
-          MediStore <span className="text-sm bg-blue-600/20 text-blue-400 px-2 py-0.5 rounded">Plus</span>
+        <Link href="/" className="text-xl font-bold text-white">
+          MediStore
         </Link>
 
         <div className="flex items-center gap-6 text-sm">
-          <Link href="/shop" className="text-zinc-300 hover:text-white transition">Shop</Link>
+          <Link href="/shop" className="text-zinc-300 hover:text-white">
+            Shop
+          </Link>
 
-          {/* FIX: Changed logic from (!user || user.role === "customer") 
-              to (user && user.role === "customer"). 
-              Now, the Cart link only shows if a user is logged in AND they are a customer.
-          */}
           {user && user.role === "customer" && (
-            <Link href="/customer" className="relative text-zinc-300 hover:text-white transition">
+            <Link href="/customer" className="relative text-zinc-300 hover:text-white">
               Cart
               {cartCount > 0 && (
-                <span className="absolute -top-2 -right-4 bg-blue-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center">
+                <span className="absolute -top-2 -right-4 bg-blue-600 text-white text-[10px] px-2 rounded-full">
                   {cartCount}
                 </span>
               )}
@@ -90,8 +103,10 @@ export default function Navbar() {
 
           {!user && (
             <>
-              <Link href="/login" className="text-zinc-300 hover:text-white">Login</Link>
-              <Link href="/register" className="px-3 py-1.5 rounded bg-blue-600 text-white hover:bg-blue-700 transition">
+              <Link href="/login" className="text-zinc-300">
+                Login
+              </Link>
+              <Link href="/register" className="bg-blue-600 px-3 py-1.5 rounded text-white">
                 Register
               </Link>
             </>
@@ -99,26 +114,24 @@ export default function Navbar() {
 
           {user && (
             <div className="relative" ref={dropdownRef}>
-              <button onClick={() => setOpen(!open)} className="flex items-center gap-2 focus:outline-none">
-                <div className="w-9 h-9 rounded-full bg-blue-600 flex items-center justify-center text-white font-semibold uppercase border-2 border-zinc-800">
-                  {user.name ? user.name.charAt(0) : "U"}
+              <button onClick={() => setOpen(!open)}>
+                <div className="w-9 h-9 rounded-full bg-blue-600 flex items-center justify-center text-white">
+                  {user.name.charAt(0)}
                 </div>
               </button>
 
               {open && (
-                <div className="absolute right-0 mt-2 w-52 bg-zinc-800 border border-zinc-700 rounded-lg shadow-xl overflow-hidden z-50">
-                  <div className="px-4 py-3 border-b border-zinc-700 bg-zinc-800/50">
-                    <p className="text-sm font-medium text-white truncate">{user.name}</p>
-                    <p className="text-xs text-blue-400 capitalize font-mono">{user.role}</p>
-                  </div>
+                <div className="absolute right-0 mt-2 w-52 bg-zinc-800 border border-zinc-700 rounded-lg">
                   <Link
-                    href={user.role === "admin" ? "/admin" : user.role === "seller" ? "/seller" : "/customer"}
-                    className="block px-4 py-2 text-sm text-zinc-300 hover:bg-zinc-700 transition"
-                    onClick={() => setOpen(false)}
+                    href={`/${user.role}`}
+                    className="block px-4 py-2 text-zinc-300 hover:bg-zinc-700"
                   >
-                    {user.role === "seller" ? "Manage Inventory" : "My Dashboard"}
+                    Dashboard
                   </Link>
-                  <button onClick={logout} className="w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-zinc-700 transition">
+                  <button
+                    onClick={logout}
+                    className="w-full text-left px-4 py-2 text-red-400 hover:bg-zinc-700"
+                  >
                     Logout
                   </button>
                 </div>
