@@ -34,3 +34,27 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+# Medicine Shop Frontend
+
+This is the **frontend** of the Medicine Shop web application. It is built using **Next.js**, **React**, **Tailwind CSS**, and **DaisyUI**. Users can browse medicines, view the community feedback, add items to the cart, and interact with the fake payment system.
+
+## Features
+
+- Browse available medicines with details.
+- Add/remove medicines to/from the cart.
+- Community feedback display and submission.
+- Fake payment simulation.
+- Responsive design with Tailwind CSS and DaisyUI.
+- Integration with backend API for data fetching.
+
+## Technologies Used
+
+- [Next.js](https://nextjs.org/)
+- [React](https://reactjs.org/)
+- [Tailwind CSS](https://tailwindcss.com/)
+- [DaisyUI](https://daisyui.com/)
+- Axios (for API calls)
+- React Toastify (for notifications)
+
+## Project Structure
+

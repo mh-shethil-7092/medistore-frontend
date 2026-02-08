@@ -14,18 +14,18 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     // 1. Fetch Stats
-    fetch("http://localhost:5000/api/admin/stats")
+    fetch("https://medistore-backend-production.up.railway.app/api/admin/stats")
       .then(res => res.json())
       .then(data => setStats(data));
 
     // 2. Fetch Users
-    fetch("http://localhost:5000/api/auth/users")
+    fetch("https://medistore-backend-production.up.railway.app/api/auth/users")
       .then(res => res.json())
       .then(data => setUsers(data));
   }, []);
 
   const changeRole = async (userId: string, newRole: string) => {
-    const res = await fetch("http://localhost:5000/api/auth/update-role", {
+    const res = await fetch("https://medistore-backend-production.up.railway.app/api/auth/update-role", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ userId, newRole }),

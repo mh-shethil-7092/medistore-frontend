@@ -3,8 +3,9 @@
 import MedicineList from "@/components/MedicineList";
 import Link from "next/link";
 import FeedbackSection from "./feedback/FeedbackSection";
-import FAQSection from "./sections/pagetwo";
+import FAQSection from "./sections/faq";
 import Hero from "./sections/Hero";
+import AboutUs from "./sections/aboutus";
 
 export default function Home() {
   return (
@@ -17,6 +18,7 @@ export default function Home() {
 
       <FeedbackSection />
       <FAQSection />
+      <AboutUs></AboutUs>
     </main>
   );
 }

@@ -17,7 +17,7 @@ export default function SellerDashboard() {
   });
 
   const fetchMedicines = useCallback(async () => {
-    const res = await fetch("http://localhost:5000/api/medicines/all");
+    const res = await fetch("https://medistore-backend-production.up.railway.app/api/medicines/all");
     const data = await res.json();
     setMyMedicines(data);
   }, []);
@@ -27,7 +27,7 @@ export default function SellerDashboard() {
   }, [fetchMedicines]);
 
   const deleteMed = async (id: string) => {
-    await fetch(`http://localhost:5000/api/medicines/delete/${id}`, { method: "DELETE" });
+    await fetch(`https://medistore-backend-production.up.railway.app/api/medicines/delete/${id}`, { method: "DELETE" });
     fetchMedicines();
   };
 
@@ -51,8 +51,8 @@ export default function SellerDashboard() {
     setLoading(true);
 
     const url = editingId
-      ? `http://localhost:5000/api/medicines/update/${editingId}`
-      : "http://localhost:5000/api/medicines/add";
+      ? `https://medistore-backend-production.up.railway.app/api/medicines/update/${editingId}`
+      : "https://medistore-backend-production.up.railway.app/api/medicines/add";
 
     await fetch(url, {
       method: editingId ? "PUT" : "POST",
